@@ -1,0 +1,83 @@
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.config/project_wizard/projects.conf"
+
+display_help() {
+    echo "Usage: open_wizard [command] [options]"
+    echo
+    echo "Commands:"
+    echo "  add <project_name> <path>    Add a new project"
+    echo "  list                          List all projects"
+    echo "  help                          Display this help message"
+    echo "  <project_name>               Open the specified project in VS Code"
+}
+
+# Ensure the config file exists
+mkdir -p "$(dirname "$CONFIG_FILE")"
+touch "$CONFIG_FILE"
+
+case "$1" in
+    add)
+        if [[ $# -ne 3 ]]; then
+            echo "Error: Invalid number of arguments for 'add'."
+            display_help
+            exit 1
+        fi
+
+        PROJECT_NAME="$2"
+        PROJECT_PATH="$3"
+
+        if [[ "$PROJECT_NAME" == *:* ]]; then
+            echo "Error: Project name cannot contain colons."
+            exit 1
+        fi
+
+        if [[ ! -d "$PROJECT_PATH" ]]; then
+            echo "Error: Path does not exist or is not a directory."
+            exit 1
+        fi
+
+        if grep -q "^$PROJECT_NAME:" "$CONFIG_FILE"; then
+            echo "Error: Project '$PROJECT_NAME' already exists."
+            exit 1
+        fi
+
+        echo "$PROJECT_NAME:$PROJECT_PATH" >> "$CONFIG_FILE"
+        echo "Project '$PROJECT_NAME' added successfully."
+        ;;
+
+    list)
+        if [[ ! -s "$CONFIG_FILE" ]]; then
+            echo "No projects registered."
+            exit 0
+        fi
+
+        column -t -s ':' "$CONFIG_FILE"
+        ;;
+
+    help | --help | -h)
+        display_help
+        ;;
+
+    *)
+        if [[ -z "$1" ]]; then
+            display_help
+            exit 0
+        fi
+
+        PROJECT_NAME="$1"
+        PROJECT_PATH=$(grep "^$PROJECT_NAME:" "$CONFIG_FILE" | cut -d ':' -f2)
+
+        if [[ -z "$PROJECT_PATH" ]]; then
+            echo "Error: Project '$PROJECT_NAME' not found."
+            exit 1
+        fi
+
+        if [[ ! -d "$PROJECT_PATH" ]]; then
+            echo "Error: The path for project '$PROJECT_NAME' does not exist."
+            exit 1
+        fi
+
+        code "$PROJECT_PATH"
+        ;;
+esac
