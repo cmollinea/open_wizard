@@ -76,10 +76,3 @@ The projects are stored in a configuration file located at $HOME/.config/project
 
 Contributions are welcome! If you have suggestions for improvements or new features, please feel free to submit an issue or create a pull request.
 
-
-▎Acknowledgments
-
-Thanks to the contributors and users who help improve this tool! Your feedback is invaluable.
-
----
-
