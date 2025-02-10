@@ -83,4 +83,3 @@ Thanks to the contributors and users who help improve this tool! Your feedback i
 
 ---
 
-Feel free to customize this README further based on specific details about your project or any additional features you may want to include!
